@@ -1,5 +1,6 @@
 package com.sg.classroster.service;
 
+import com.sg.classroster.dao.ClassRosterAuditDao;
 import com.sg.classroster.dao.ClassRosterDao;
 import com.sg.classroster.dao.ClassRosterPersistenceException;
 import com.sg.classroster.dto.Student;
@@ -9,9 +10,11 @@ import java.util.List;
 public class ClassRosterServiceLayerImpl implements ClassRosterServiceLayer{
 
     ClassRosterDao dao;
+    private ClassRosterAuditDao auditDao;
 
-    public ClassRosterServiceLayerImpl(ClassRosterDao dao){
+    public ClassRosterServiceLayerImpl(ClassRosterDao dao, ClassRosterAuditDao auditDao){
         this.dao = dao;
+        this.auditDao = auditDao;
     }
 
     @Override
@@ -34,6 +37,10 @@ public class ClassRosterServiceLayerImpl implements ClassRosterServiceLayer{
         // We passed all our business rules checks so go ahead and create student object
         dao.addStudent(student.getStudentId(), student);
 
+        //Write to Log file
+        auditDao.writeAuditEntry(
+                "Student " + student.getStudentId() + " CREATED.");
+
     }
 
     @Override
@@ -48,7 +55,10 @@ public class ClassRosterServiceLayerImpl implements ClassRosterServiceLayer{
 
     @Override
     public Student removeStudent(String studentId) throws ClassRosterPersistenceException {
-        return dao.removeStudent(studentId);
+        Student removedStudent = dao.removeStudent(studentId);
+        // Write to audit log
+        auditDao.writeAuditEntry("Student " + studentId + " REMOVED.");
+        return removedStudent;
     }
 
     //Check that each field in object is not null and not empty/whitespace
