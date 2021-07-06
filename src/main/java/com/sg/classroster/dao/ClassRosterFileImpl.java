@@ -7,8 +7,16 @@ import java.util.*;
 
 
 public class ClassRosterFileImpl implements ClassRosterDao{
-    public static final String ROSTER_FILE = "roster.txt";
+    private final String ROSTER_FILE;
     public static final String DELIMITER = "::";
+
+    public ClassRosterFileImpl(){
+        ROSTER_FILE = "roster.txt";
+    }
+
+    public ClassRosterFileImpl(String rosterTextFile){
+        ROSTER_FILE = rosterTextFile;
+    }
 
     @Override
     public Student addStudent(String studentId, Student student)
